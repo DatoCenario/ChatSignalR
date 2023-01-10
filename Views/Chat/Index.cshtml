@@ -1,0 +1,87 @@
+@model WebApplication2.Controllers.MessengerViewModel
+
+<style>
+    /* Add some padding and spacing to the chat menu */
+    #chat-menu {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    
+    /* Style the chat menu heading */
+    #chat-menu h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+    
+    /* Style the chat menu list items */
+    #chat-menu li {
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    /* Style the selected chat menu list item */
+    #chat-menu li.selected {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    /* Style the chat window card */
+    #chat-window .card {
+        margin-bottom: 10px;
+        border-radius: 5px;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    /* Style the chat window card body */
+    #chat-window .card-body {
+        padding: 10px;
+    }
+    
+    /* Style the username and message time in the chat window */
+    #chat-window .card-body b {
+        font-size: 0.9em;
+    }
+</style>
+
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <div class="col-3 bg-light p-3">
+            <h3 class="text-center">Chats</h3>
+            <hr />
+            <ul class="list-group">
+                @foreach (var chat in Model.Chats)
+                {
+                    <li class="list-group-item">
+                        <a asp-route-id="@chat.Id" asp-page="./Chat" onclick="openChat(@chat.Id)" class="text-decoration-none">@chat.Name</a>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="col-9 p-3">
+            <div id="chat-window">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="text-center">Welcome to the Chat</h3>
+                        <p class="text-center">Select a chat from the menu on the left to start messaging.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openChat(chatId) {
+        var chats = @Html.Raw(Json.Serialize(Model.Chats));
+        var chat = chats.find(c => c.id === chatId);
+        if (chat) {
+            var messagesHtml = "";
+            for (var i = 0; i < chat.messages.length; i++) {
+                var message = chat.messages[i];
+                messagesHtml += "<div class='card'><div class='card-body'><b>" + message.username + "</b> " + message.time + "<br>" + message.text + "</div></div>";
+            }
+            document.getElementById("chat-window").innerHTML = messagesHtml;
+        }
+    }
+</script>
