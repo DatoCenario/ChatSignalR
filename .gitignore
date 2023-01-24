@@ -1,0 +1,6 @@
+bin/
+obj/
+/.idea
+front/node_modules
+front/.vscode
+front/.next

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  chat:
+    container_name: chat
+    image: awesome/chat_app
+    build: .
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Local
+      - ASPNETCORE_URLS=http://+:7203
+      - EF_CORE_CONN=Server=chat_postgres;Port=5432;Database=chat_app;User Id=postgres;Password=postgres;
+    restart: always
+    ports:
+      - '7203:7203'
+  chat_front:
+    container_name: chat_front
+    image: awesome/chat_front
+    build: ./front
+    restart: always
+    ports:
+      - '3001:3001'
+  db:
+    container_name: chat_postgres
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: chat_app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'

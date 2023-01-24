@@ -17,7 +17,7 @@ namespace WebApplication2.Data.EF.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.1")
+                .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -162,8 +162,10 @@ namespace WebApplication2.Data.EF.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<bool>("IsPrivate")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -184,6 +186,9 @@ namespace WebApplication2.Data.EF.Migrations
 
                     b.Property<long>("OwnerId")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTime>("SendTime")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -252,12 +257,18 @@ namespace WebApplication2.Data.EF.Migrations
                     b.Property<long>("ChatId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("InviterId")
+                        .IsRequired()
+                        .HasColumnType("bigint");
+
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ChatId");
+
+                    b.HasIndex("InviterId");
 
                     b.HasIndex("UserId");
 
@@ -453,6 +464,12 @@ namespace WebApplication2.Data.EF.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("WebApplication2.Data.EF.Domain.User", "Inviter")
+                        .WithMany("InvitedByUser")
+                        .HasForeignKey("InviterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("WebApplication2.Data.EF.Domain.User", "User")
                         .WithMany("ChatUsers")
                         .HasForeignKey("UserId")
@@ -460,6 +477,8 @@ namespace WebApplication2.Data.EF.Migrations
                         .IsRequired();
 
                     b.Navigation("Chat");
+
+                    b.Navigation("Inviter");
 
                     b.Navigation("User");
                 });
@@ -486,6 +505,8 @@ namespace WebApplication2.Data.EF.Migrations
                     b.Navigation("ChatMessages");
 
                     b.Navigation("ChatUsers");
+
+                    b.Navigation("InvitedByUser");
                 });
 #pragma warning restore 612, 618
         }

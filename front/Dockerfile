@@ -1,0 +1,12 @@
+FROM node:16.18.0-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+ENV BACKEND_HOST_URL=chat
+ENV BACKEND_PORT=7203
+ENV FRONTEND_HOST_URL=0.0.0.0
+ENV FRONTEND_PORT=3001
+
+CMD ["npm", "start"]

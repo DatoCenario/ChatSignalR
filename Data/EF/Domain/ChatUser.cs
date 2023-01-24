@@ -6,7 +6,9 @@ public class ChatUser: IEntity
     
     public long ChatId { get; set; }
     public long UserId { get; set; }
+    public long? InviterId { get; set; }
 
     public virtual User User { get; set; }
+    public virtual User Inviter { get; set; }
     public virtual Chat Chat { get; set; }
 }

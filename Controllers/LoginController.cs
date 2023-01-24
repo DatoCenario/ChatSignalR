@@ -1,3 +1,5 @@
+using System;
+using System.Net.Mail;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -8,10 +10,10 @@ using WebApplication2.Models;
 
 namespace WebApplication2.Controllers;
 
-[Route("{controller}")]
+[Route("api/{controller}")]
 public class LoginController: Controller
 {
-    private readonly Regex _phoneDetectRegex = new Regex(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$");
+    public static Regex PhoneDetectRegex = new Regex(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$");
     
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
@@ -22,20 +24,14 @@ public class LoginController: Controller
         _signInManager = signInManager;
     }
 
-    [HttpGet("Login")]
-    public IActionResult Login()
+    [HttpGet("Test")]
+    public string Test()
     {
-        return View("Login");
+        return "lwjrth4th";
     }
-    
-    [HttpGet("Register")]
-    public IActionResult Register()
-    {
-        return View("Register");
-    }
-    
+
     [HttpPost("Login")]
-    public async Task<IActionResult> Login([FromForm] LoginModel request)
+    public async Task<IActionResult> Login([FromBody] LoginModel request)
     {
         var user = await _userManager.FindByNameAsync(request.Login);
 
@@ -48,16 +44,22 @@ public class LoginController: Controller
 
         if (!res.Succeeded)
         {
-            return View("Login", request);
+            return new JsonResult(new LoginResponse
+            {
+                Success = false
+            });
         }
-
-        return RedirectToAction("Index", "Chat");
+        
+        return new JsonResult(new LoginResponse
+        {
+            Success = true
+        });
     }
     
     [HttpPost("Register")]
-    public async Task<IActionResult> Register([FromForm] RegisterModel request)
+    public async Task<IActionResult> Register([FromBody] RegisterModel request)
     {
-        var isPhone = _phoneDetectRegex.Match(request.MobileOrEmail).Success;
+        var isPhone = PhoneDetectRegex.Match(request.MobileOrEmail).Success;
 
         var user = new User
         {
@@ -71,12 +73,24 @@ public class LoginController: Controller
 
         if (!res.Succeeded)
         {
-            ViewData.Add("RegisterErrors", res.Errors.Select(e => e.Description).ToArray());
-            return View("Register", request);
+            return new JsonResult(new LoginResponse
+            {
+                Success = false,
+                FieldErrors = res.Errors.Select(x => x.Description).ToArray()
+            });
         }
 
         await _signInManager.PasswordSignInAsync(user, request.Password, true, true);
-        
-        return RedirectToAction("Index", "Chat");
+
+        return new JsonResult(new LoginResponse
+        {
+            Success = true
+        });
     }
+}
+
+public class LoginResponse
+{
+    public bool Success { get; set; }
+    public ICollection<string> FieldErrors { get; set; }
 }

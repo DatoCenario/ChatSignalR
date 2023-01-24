@@ -8,5 +8,6 @@ public class User: IdentityUser<long>
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public virtual ICollection<ChatUser> ChatUsers { get; set; }
+    public virtual ICollection<ChatUser> InvitedByUser { get; set; }
     public virtual ICollection<ChatMessage> ChatMessages { get; set; }
 }

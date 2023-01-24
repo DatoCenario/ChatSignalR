@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 
@@ -9,6 +10,7 @@ public class ChatMessage: IEntity
     public long ChatId { get; set; }
     public long OwnerId { get; set; }
     public string Text { get; set; }
+    public DateTime SendTime { get; set; }
     public virtual ICollection<ChatMessageImageLink> MessageImageLinks { get; set; }
     public virtual Chat Chat { get; set; }
     public virtual User Owner { get; set; }

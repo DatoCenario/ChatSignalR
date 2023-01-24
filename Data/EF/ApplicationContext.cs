@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -21,10 +23,24 @@ public class ApplicationContext : IdentityDbContext<User, IdentityRole<long>, lo
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        foreach (var property in builder.Model.GetEntityTypes()
+                     .SelectMany(t => t.GetProperties())
+                     .Where(p => p.ClrType == typeof(DateTime)
+                                 || p.ClrType == typeof(DateTime?))
+                     .Where(p => p.GetColumnType() == null))
+        {
+            property.SetColumnType("timestamp without time zone");
+        }
+        
         builder.Entity<User>()
             .HasMany(u => u.ChatUsers)
             .WithOne(e => e.User)
             .HasForeignKey(e => e.UserId);
+        
+        builder.Entity<User>()
+            .HasMany(u => u.InvitedByUser)
+            .WithOne(e => e.Inviter)
+            .HasForeignKey(e => e.InviterId);
         
         builder.Entity<Chat>()
             .HasMany(u => u.ChatUsers)

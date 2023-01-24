@@ -1,4 +1,9 @@
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data.EF;
@@ -28,7 +33,7 @@ public abstract class CheckUserInChatQueryHandlerBase<TRequest, TOut>: IRequestH
 
         if (user == null)
         {
-            throw new Exception();
+            throw new Exception("user not found");
         }
 
         var anyUserChat = await Context.Users
@@ -39,7 +44,7 @@ public abstract class CheckUserInChatQueryHandlerBase<TRequest, TOut>: IRequestH
 
         if (!anyUserChat)
         {
-            throw new Exception();
+            throw new Exception("user not belogs to chat");
         }
 
         return await InnerHandle(request, cancellationToken);
